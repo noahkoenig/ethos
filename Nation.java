@@ -4,12 +4,14 @@ import java.util.List;
 public class Nation {
     
     final NationType type;
-    List<State> states = new ArrayList<State>();
+    Settlement capital;
+    List<Region> regions = new ArrayList<Region>();
 
     Nation(NationType type) {
         this.type = type;
     }
 
     public NationType getType() { return type; }
-    public List<State> getStates() { return states; }
+    
+    public List<Region> getRegions() { return regions; }
 }
