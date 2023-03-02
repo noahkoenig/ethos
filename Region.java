@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
 
+import grid.Tile;
+
 public class Region {
 
     String name;

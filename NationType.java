@@ -1,4 +1,5 @@
 public enum NationType {
+    
     GERMANY ("Germany", "German"),
     FRANCE ("France", "French");
 

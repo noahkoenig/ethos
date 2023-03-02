@@ -1,0 +1,11 @@
+regarding unit movement:
+
+MP = movement points
+
+diagonal movement costs 1.5 MP, direct movement costs 1.0 MP.
+
+MP that cannot be used in a turn (because of terrain or lacking MP) are transfered into the next turn.
+
+example:
+a unit has 2 MP in a turn. a diagonal movement is executed. the unit has 0.5 MP left but cannot use them.
+0.5 MP are transferred into the next turn, so the unit starts it with 2.5 MP, making both a diagonal and direct movement possible.
