@@ -6,36 +6,41 @@ import java.util.Map;
 
 public class Grid {
 
-    static int width;
-    static int height;
-    static Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
+    private static int width;
+    private static int height;
+    private static Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
     public Grid(int width, int height) {
         Grid.width = width;
         Grid.height = height;
-        generateGrid(width, height, 66);
+        generateGrid(width, height, 50, 5);
     }
 
     public static void main(String args[]) {
         Grid grid = new Grid(30, 20);
         grid.printGrid();
+        for (Tile tile : tiles.get(10)) {
+            System.out.println(tile.getBiome() + " " + tile.getElevation() + " " + tile.getTerrain());
+        }
     }
 
     /**
      * @param width
      * @param height
      * @param waterPercentage : approximate, not exact
+     * @param latitudeTolerance : how much the latitude value can differ from the min- and maxLatitude values
      */
-    public void generateGrid(int width, int height, int waterPercentage) {
+    public void generateGrid(int width, int height, int oceanPercentage, int latitudeTolerance) {
         for(int x = 0; x < height; x++) {
             List<Tile> row = new ArrayList<Tile>();
             for(int y = 0; y < width; y++) {
-                row.add(new Tile(1, (int) (Math.random() * 100 + 1) > waterPercentage
-                    ? getRandomLandBiomeByLatitude(getLatitudeOfRow(x), 10) : Biome.WATER,
-                getRandomTerrain(), x, y));
+                Biome biome = (int) (Math.random() * 100 + 1) > oceanPercentage
+                    ? getRandomLandBiomeByLatitude(getLatitudeOfRow(x), latitudeTolerance) : Biome.OCEAN;
+                row.add(new Tile(getRandomElevationByBiome(biome), biome, getRandomTerrain(), x, y));
             }
             tiles.put(x, row);
         }
+        // TODO: need a function here that aligns all elevations
     }
 
     public void printGrid() {
@@ -47,6 +52,11 @@ public class Grid {
             System.out.println(row);
         }
     }
+
+    public Elevation getRandomElevationByBiome(Biome biome) {
+        byte index = (byte) ((Math.random() * (biome.getMaxElevation() - biome.getMinElevation()) + biome.getMinElevation()));
+        return getElevationByIndex(index);
+    }
     
     /**
      * @param latitude : needs to be between 0 and 90
@@ -55,7 +65,7 @@ public class Grid {
     public Biome getRandomLandBiomeByLatitude(int latitude, int tolerance) {
         List<Biome> biomes = new ArrayList<Biome>();
         for (Biome biome : Biome.values()) {
-            if (biome.equals(Biome.WATER)) {
+            if (biome.equals(Biome.OCEAN) || biome.equals(Biome.LAKE)) {
                 continue;
             } else if (biome.getMinLatitude() - tolerance <= latitude && latitude <= biome.getMaxLatitude() + tolerance) {
                 biomes.add(biome);
@@ -85,6 +95,15 @@ public class Grid {
             }
         }
         return neighboringTiles;
+    }
+
+    public static Elevation getElevationByIndex(byte index) {
+        for (Elevation elevation : Elevation.values()) {
+            if (elevation.getIndex() == index) {
+                return elevation;
+            }
+        }
+        return null;
     }
 
     private int getLatitudeOfRow(int row) {
