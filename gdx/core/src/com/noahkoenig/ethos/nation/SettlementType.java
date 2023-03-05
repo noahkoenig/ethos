@@ -1,4 +1,4 @@
-
+package com.noahkoenig.ethos.nation;
 
 public enum SettlementType {
     

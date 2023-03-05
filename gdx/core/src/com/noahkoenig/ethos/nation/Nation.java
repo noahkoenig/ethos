@@ -1,4 +1,4 @@
-
+package com.noahkoenig.ethos.nation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,9 @@
-
+package com.noahkoenig.ethos.nation;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import grid.Tile;
+import com.noahkoenig.ethos.grid.Tile;
 
 public class Region {
 

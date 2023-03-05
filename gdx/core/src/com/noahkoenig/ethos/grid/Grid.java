@@ -1,4 +1,4 @@
-package grid;
+package com.noahkoenig.ethos.grid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,18 +11,10 @@ public class Grid {
     private static int height;
     private static Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
-    public Grid(int width, int height) {
+    public Grid(int width, int height, int oceanPercentage, int latitudeTolerance) {
         Grid.width = width;
         Grid.height = height;
-        generateGrid(width, height, 50, 5);
-    }
-
-    public static void main(String args[]) {
-        Grid grid = new Grid(30, 20);
-        grid.printGrid();
-        for (Tile tile : tiles.get(10)) {
-            System.out.println(tile.getBiome() + " " + tile.getElevation() + " " + tile.getTerrain());
-        }
+        generateGrid(width, height, oceanPercentage, latitudeTolerance);
     }
 
     /**

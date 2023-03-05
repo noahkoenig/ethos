@@ -1,4 +1,4 @@
-package grid;
+package com.noahkoenig.ethos.grid;
 
 public enum Biome {
     
