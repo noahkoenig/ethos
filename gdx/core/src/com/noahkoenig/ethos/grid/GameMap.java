@@ -22,7 +22,6 @@ public class GameMap {
 	public void render (OrthographicCamera camera, SpriteBatch batch) {
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
-
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
 		batch.end();
@@ -32,10 +31,8 @@ public class GameMap {
 		tiledMap.dispose();
 	}
 
-	public Biome getTileTypeByCoordinate (int layer, int col, int row) {
-		System.out.println(layer + " " + row + " " + col);
+	public Biome getBiomeByCoordinate (int layer, int col, int row) {
 		Cell cell = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getCell(col, row);
-		
 		if (cell != null) {
 			TiledMapTile tile = cell.getTile();
 			if (tile != null) {
@@ -46,7 +43,7 @@ public class GameMap {
 	}
 
 	public Biome getBiomeByLocation(int layer, float x, float y) {
-		return this.getTileTypeByCoordinate(layer, (int) (x / Biome.TILE_SIZE), (int) (y / Biome.TILE_SIZE));
+		return getBiomeByCoordinate(layer, (int) (x / Biome.TILE_SIZE), (int) (y / Biome.TILE_SIZE));
 	}
 
 	public int getWidth () {

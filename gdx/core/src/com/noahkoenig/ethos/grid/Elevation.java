@@ -44,40 +44,25 @@ public enum Elevation {
      */
     LOWLAND((byte) 1),
     /**
-     * Also known as the sunlight or euphotic zone, this is the topmost layer of the ocean, extending from the surface down to about 200 meters.
-     * It is characterized by abundant sunlight, high oxygen levels, and a wide range of marine life, including plankton, fish, and sea birds.
+     * This is the uppermost layer of the ocean that receives enough sunlight to support photosynthesis by phytoplankton.
+     * The euphotic zone extends from the surface down to about 200 meters in depth and is the most biologically productive part of the ocean.
      */
-    EPIPELAGIC((byte) 0),
+    EUPHOTIC((byte) 0),
     /**
-     * Also known as the twilight or disphotic zone, this layer extends from 200 to 1000 meters below the surface.
-     * It is characterized by decreasing sunlight, cooler temperatures, and lower oxygen levels.
-     * Marine life in this zone includes a variety of small fish, squid, and other organisms adapted to low light conditions.
+     * The dysphotic zone is the layer of the ocean where there is not enough sunlight for photosynthesis to occur, but there is still some light penetration.
+     * The depth of the dysphotic zone varies depending on factors like water clarity and location, but it generally extends from about 200 to 1000 meters deep.
      */
-    MESOPELAGIC((byte) -1),
+    DYSPHOTIC((byte) -1),
     /**
-     * Also known as the midnight or aphotic zone, this layer extends from 1000 to 4000 meters below the surface.
-     * It is characterized by complete darkness, cold temperatures, and extremely high pressure.
-     * Marine life in this zone is dominated by bioluminescent creatures such as lanternfish, anglerfish, and jellyfish.
+     * This is the deepest layer of the ocean where no sunlight penetrates, making it completely dark.
+     * The aphotic zone starts at a depth of around 1000 meters and extends down to the seafloor.
+     * Life in the aphotic zone must rely on alternative energy sources, such as chemosynthesis, which is the process of using chemicals instead of sunlight to produce energy.
      */
-    BATHYPELAGIC((byte) -2),
-    /**
-     * This layer extends from 4000 to 6000 meters below the surface.
-     * It is characterized by very low temperatures, high pressure, and a lack of nutrients.
-     * Marine life in this zone is limited to a few specialized species such as deep-sea amphipods and copepods.
-     */
-    ABYSSOPELAGIC((byte) -3),
-    /**
-     * Also known as the trenches or ultra-abyssal zone, this layer extends from 6000 meters to the bottom of the ocean.
-     * It includes the deepest parts of the ocean, such as the Mariana Trench, and is characterized by extreme cold, pressure, and darkness.
-     * Only a few species of specialized creatures such as amphipods, polychaete worms, and bacteria are known to live in this zone.
-     */
-    HADOPELAGIC((byte) -4);
+    APHOTIC((byte) -2);
 
-    private byte index;
+    public final byte INDEX;
 
     Elevation(byte index) {
-        this.index = index;
+        this.INDEX = index;
     }
-
-    public byte getIndex() { return index; }
 }

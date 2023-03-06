@@ -40,14 +40,14 @@ public class Grid {
         for(int i = 0; i < tiles.size(); i++) {
             String row = "";
             for(Tile tile : tiles.get(i)) {
-                row += tile.getBiome().getId() + "  ";
+                row += tile.getBiome().ID + "  ";
             }
             System.out.println(row);
         }
     }
 
     public Elevation getRandomElevationByBiome(Biome biome) {
-        byte index = (byte) ((Math.random() * (biome.getMaxElevation() - biome.getMinElevation()) + biome.getMinElevation()));
+        byte index = (byte) ((Math.random() * (biome.MAX_ELEVATION - biome.MIN_ELEVATION) + biome.MIN_ELEVATION));
         return getElevationByIndex(index);
     }
     
@@ -60,7 +60,7 @@ public class Grid {
         for (Biome biome : Biome.values()) {
             if (biome.equals(Biome.OCEAN) || biome.equals(Biome.LAKE)) {
                 continue;
-            } else if (biome.getMinLatitude() - tolerance <= latitude && latitude <= biome.getMaxLatitude() + tolerance) {
+            } else if (biome.MIN_LATITUDE - tolerance <= latitude && latitude <= biome.MAX_LATITUDE + tolerance) {
                 biomes.add(biome);
             }
         }
@@ -92,7 +92,7 @@ public class Grid {
 
     public static Elevation getElevationByIndex(byte index) {
         for (Elevation elevation : Elevation.values()) {
-            if (elevation.getIndex() == index) {
+            if (elevation.INDEX == index) {
                 return elevation;
             }
         }
