@@ -1,0 +1,55 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "map.tmx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "fileStates": {
+        "#ethos": {
+            "scaleInDock": 1
+        },
+        "#tiles": {
+            "scaleInDock": 1
+        },
+        "map.tmx": {
+            "scale": 1.63875,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 288.0244088482075,
+                "y": 159.57284515636917
+            }
+        },
+        "tiles.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 16
+        },
+        "tileset.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 5.5
+        }
+    },
+    "last.imagePath": "C:/Users/email/OneDrive/Personal/Privat/Ethos/gdx/assets/tiles",
+    "map.lastUsedFormat": "tmx",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "openFiles": [
+        "tileset.tsx",
+        "map.tmx"
+    ],
+    "project": "ethos.tiled-project",
+    "recentFiles": [
+        "tileset.tsx",
+        "map.tmx",
+        "tiles.tsx"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    },
+    "tileset.type": 0
+}

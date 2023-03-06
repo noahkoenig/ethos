@@ -11,18 +11,18 @@ public class Grid {
     private static int height;
     private static Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
-    public Grid(int width, int height, int oceanPercentage, int latitudeTolerance) {
-        Grid.width = width;
-        Grid.height = height;
-        generateGrid(width, height, oceanPercentage, latitudeTolerance);
-    }
-
     /**
      * @param width
      * @param height
      * @param waterPercentage : approximate, not exact
      * @param latitudeTolerance : how much the latitude value can differ from the min- and maxLatitude values
      */
+    public Grid(int width, int height, int oceanPercentage, int latitudeTolerance) {
+        Grid.width = width;
+        Grid.height = height;
+        generateGrid(width, height, oceanPercentage, latitudeTolerance);
+    }
+
     public void generateGrid(int width, int height, int oceanPercentage, int latitudeTolerance) {
         for(int x = 0; x < height; x++) {
             List<Tile> row = new ArrayList<Tile>();
@@ -40,7 +40,7 @@ public class Grid {
         for(int i = 0; i < tiles.size(); i++) {
             String row = "";
             for(Tile tile : tiles.get(i)) {
-                row += tile.getBiome().getIcon() + "  ";
+                row += tile.getBiome().getId() + "  ";
             }
             System.out.println(row);
         }

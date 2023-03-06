@@ -1,8 +1,7 @@
-package com.gdx.ethos;
+package com.noahkoenig.ethos;
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.noahkoenig.ethos.Ethos;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
