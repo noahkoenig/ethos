@@ -1,4 +1,4 @@
-package com.noahkoenig.ethos.grid;
+package com.noahkoenig.ethos.grid.enums;
 
 public enum GridType { // unused at the moment
     RANDOM,

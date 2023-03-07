@@ -1,11 +1,20 @@
-regarding unit movement:
-
 MP = movement points
 
+
+unit movement:
+
 diagonal movement costs 1.5 MP, direct movement costs 1.0 MP.
-
 MP that cannot be used in a turn (because of terrain or lacking MP) are transfered into the next turn.
-
-example:
-a unit has 2 MP in a turn. a diagonal movement is executed. the unit has 0.5 MP left but cannot use them.
+example: a unit has 2 MP in a turn. a diagonal movement is executed. the unit has 0.5 MP left but cannot use them.
 0.5 MP are transferred into the next turn, so the unit starts it with 2.5 MP, making both a diagonal and direct movement possible.
+
+another idea is to give units MP every second turn. e.g. a unit has a maximum of 4 MP within 2 turns.
+in CIV VI, that would mean that the unit has 2 MP per turn.
+but in Ethos, the player can decide if they want to use 4 MP in one turn (exhausting your units) and none the other (units need rest).
+this would make transferring the MP into the next turn unnecessary. the points within a two turn block use the same MP pool anyway.
+
+
+morale and experience system:
+
+we can also implement a morale system where your units are unhappier if they are exhausted
+the morale system needs to be in tandem with the experience system: sending your troops into battle would make them exhausted but experienced

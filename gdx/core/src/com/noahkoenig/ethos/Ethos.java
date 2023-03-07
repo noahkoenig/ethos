@@ -4,22 +4,24 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.noahkoenig.ethos.grid.Biome;
 import com.noahkoenig.ethos.grid.GameMap;
+import com.noahkoenig.ethos.grid.enums.Biome;
 
 public class Ethos extends ApplicationAdapter {
 	
-	SpriteBatch batch;
+    SpriteBatch batch;
     OrthographicCamera camera;
     Viewport viewport;
     GameMap gameMap;
     float deltaX, deltaY;
+    boolean renderMap = false;
     
 	@Override
 	public void create () {
@@ -42,6 +44,7 @@ public class Ethos extends ApplicationAdapter {
                 return false;
             }
         });
+        System.out.println("Welcome to Ethos! Press L to load the map into the viewport.");
 	}
 
 	@Override
@@ -50,7 +53,9 @@ public class Ethos extends ApplicationAdapter {
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         handleInput();
-        gameMap.render(camera, batch);
+        if (renderMap) {
+            gameMap.render(camera, batch);
+        }
 	}
 	
 	@Override
@@ -58,6 +63,11 @@ public class Ethos extends ApplicationAdapter {
 		batch.dispose();
 		gameMap.dispose();
 	}
+
+    @Override
+    public void resize (int width, int height) {
+        viewport.update(width, height);
+    }
 
     private void handleInput() {
         if (Gdx.input.isButtonPressed(Buttons.LEFT)) {
@@ -69,11 +79,9 @@ public class Ethos extends ApplicationAdapter {
             if (biome != null) {
                 System.out.println("You clicked on tile with id " + biome.ID + " " + biome.toString());
             }
+        } else if (Gdx.input.isKeyPressed(Keys.L)) {
+            gameMap.loadTmxFile();
+            renderMap = true;
         }
-    }
-
-    @Override
-    public void resize (int width, int height) {
-        viewport.update(width, height);
     }
 }

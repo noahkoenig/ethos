@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.noahkoenig.ethos.grid.enums.Biome;
+import com.noahkoenig.ethos.grid.enums.Elevation;
+import com.noahkoenig.ethos.grid.enums.Terrain;
+
 public class Grid {
 
-    private static int width;
-    private static int height;
-    private static Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
+    private int width;
+    private int height;
+    private Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
     /**
      * @param width
@@ -18,8 +22,8 @@ public class Grid {
      * @param latitudeTolerance : how much the latitude value can differ from the min- and maxLatitude values
      */
     public Grid(int width, int height, int oceanPercentage, int latitudeTolerance) {
-        Grid.width = width;
-        Grid.height = height;
+        this.width = width;
+        this.height = height;
         generateGrid(width, height, oceanPercentage, latitudeTolerance);
     }
 
@@ -81,7 +85,7 @@ public class Grid {
                 for (int x = -1; x <= 1; x++) {
                     if (x != 0 || y != 0) {
                         neighboringTiles.add(row.get(
-                            isColumnOnGrid(width + x) ? width + x : getModulo(width + x, Grid.width)
+                            isColumnOnGrid(width + x) ? width + x : getModulo(width + x, width)
                         ));
                     }
                 }
@@ -100,7 +104,7 @@ public class Grid {
     }
 
     private int getLatitudeOfRow(int row) {
-        return Math.abs((int) Math.round(90 - (row * 180 / (Grid.height - 1))));
+        return Math.abs((int) Math.round(90 - (row * 180 / (height - 1))));
     }
 
     private boolean isRowOnGrid(int row) {
