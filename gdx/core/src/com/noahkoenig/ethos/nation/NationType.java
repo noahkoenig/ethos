@@ -2,18 +2,15 @@ package com.noahkoenig.ethos.nation;
 
 public enum NationType {
     
+    NONE("None", "None"),
     GERMANY ("Germany", "German"),
     FRANCE ("France", "French");
 
-    String name;
-    String adjective;
+    public final String NAME;
+    public final String ADJECTIVE;
 
     NationType(String name, String adjective) {
-        this.name = name;
-        this.adjective = adjective;
+        this.NAME = name;
+        this.ADJECTIVE = adjective;
     }
-
-    public String getName() { return name; }
-
-    public String getAdjective() { return adjective; }
 }

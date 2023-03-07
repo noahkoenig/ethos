@@ -1,4 +1,4 @@
-package com.noahkoenig.ethos.grid.enums;
+package com.noahkoenig.ethos.gamemap.enums;
 
 public enum Terrain {
     FLAT,

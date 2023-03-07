@@ -1,43 +1,52 @@
-package com.noahkoenig.ethos.grid;
+package com.noahkoenig.ethos.gamemap.grid;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.noahkoenig.ethos.grid.enums.Biome;
-import com.noahkoenig.ethos.grid.enums.Elevation;
-import com.noahkoenig.ethos.grid.enums.Terrain;
+import com.noahkoenig.ethos.gamemap.enums.Biome;
+import com.noahkoenig.ethos.gamemap.enums.Elevation;
+import com.noahkoenig.ethos.gamemap.enums.GridType;
+import com.noahkoenig.ethos.gamemap.enums.Terrain;
 
-public class Grid {
+/**
+ * contains all information relevant for the GameMap
+ */
+public abstract class Grid {
 
-    private int width;
-    private int height;
-    private Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
+    public final GridType TYPE;
+    protected int width;
+    protected int height;
+    protected int oceanPercentage;
+    protected int latitudeTolerance;
+    protected Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
     /**
-     * @param width
-     * @param height
-     * @param waterPercentage : approximate, not exact
-     * @param latitudeTolerance : how much the latitude value can differ from the min- and maxLatitude values
+     * @param width : minimum value is 2
+     * @param height : minimum value is 2
+     * @param oceanPercentage : approximate, not exact
+     * @param latitudeTolerance : how much the latitude value can differ from the min- and maxLatitude values. the actual effect of the tolerance is highly dependent on the width and height values
      */
-    public Grid(int width, int height, int oceanPercentage, int latitudeTolerance) {
+    protected Grid(GridType type, int width, int height, int oceanPercentage, int latitudeTolerance) {
+        this.TYPE = type;
         this.width = width;
         this.height = height;
-        generateGrid(width, height, oceanPercentage, latitudeTolerance);
+        this.oceanPercentage = oceanPercentage;
+        this.latitudeTolerance = latitudeTolerance;
+        fillGridWith(Elevation.EUPHOTIC, Biome.OCEAN, Terrain.FLAT);
     }
 
-    public void generateGrid(int width, int height, int oceanPercentage, int latitudeTolerance) {
+    protected abstract void generateGrid();
+
+    private void fillGridWith(Elevation elevation, Biome biome, Terrain terrain) {
         for(int x = 0; x < height; x++) {
             List<Tile> row = new ArrayList<Tile>();
             for(int y = 0; y < width; y++) {
-                Biome biome = (int) (Math.random() * 100 + 1) > oceanPercentage
-                    ? getRandomLandBiomeByLatitude(getLatitudeOfRow(x), latitudeTolerance) : Biome.OCEAN;
-                row.add(new Tile(getRandomElevationByBiome(biome), biome, getRandomTerrain(), x, y));
+                row.add(new Tile(elevation, biome, terrain, x, y));
             }
             tiles.put(x, row);
         }
-        // TODO: need a function here that aligns all elevations
     }
 
     public void printGrid() {
@@ -62,7 +71,7 @@ public class Grid {
     public Biome getRandomLandBiomeByLatitude(int latitude, int tolerance) {
         List<Biome> biomes = new ArrayList<Biome>();
         for (Biome biome : Biome.values()) {
-            if (biome.equals(Biome.OCEAN) || biome.equals(Biome.LAKE)) {
+            if (biome.IS_WATER) {
                 continue;
             } else if (biome.MIN_LATITUDE - tolerance <= latitude && latitude <= biome.MAX_LATITUDE + tolerance) {
                 biomes.add(biome);
@@ -85,7 +94,7 @@ public class Grid {
                 for (int x = -1; x <= 1; x++) {
                     if (x != 0 || y != 0) {
                         neighboringTiles.add(row.get(
-                            isColumnOnGrid(width + x) ? width + x : getModulo(width + x, width)
+                            isColumnOnGrid(width + x) ? width + x : getModulo(width + x, this.width)
                         ));
                     }
                 }
@@ -103,7 +112,7 @@ public class Grid {
         return null;
     }
 
-    private int getLatitudeOfRow(int row) {
+    protected int getLatitudeOfRow(int row) {
         return Math.abs((int) Math.round(90 - (row * 180 / (height - 1))));
     }
 
@@ -126,7 +135,36 @@ public class Grid {
     }
 
     public Tile getTileByPosition(int x, int y) {
-        return tiles.get(y).get(x);
+        try {
+            return tiles.get(y).get(x);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public int getLandTileAmount() {
+        int landTileAmount = 0;
+        for(int y = 0; y < tiles.size(); y++) {
+            for(Tile tile : tiles.get(y)) {
+                if (!tile.getBiome().IS_WATER) {
+                    landTileAmount++;
+                }
+            }
+        }
+        return landTileAmount;
+    }
+
+    public int getWaterTileAmount() {
+        int waterTileAmount = 0;
+        for(int y = 0; y < tiles.size(); y++) {
+            for(Tile tile : tiles.get(y)) {
+                if (tile.getBiome().IS_WATER) {
+                    waterTileAmount++;
+                }
+            }
+        }
+        return waterTileAmount;
     }
 
     // Getters and Setters ============================================================================================================
@@ -134,6 +172,10 @@ public class Grid {
     public int getWidth() { return width; }
 
     public int getHeight() { return height; }
+
+    public int getOceanPercentage() { return oceanPercentage; }
+
+    public int getLatitudeTolerance() { return latitudeTolerance; }
 
     public Map<Integer, List<Tile>> getTiles() { return tiles; }
 }

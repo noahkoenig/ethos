@@ -1,4 +1,4 @@
-package com.noahkoenig.ethos.grid;
+package com.noahkoenig.ethos.gamemap;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -12,12 +12,12 @@ import javax.xml.stream.XMLStreamWriter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.noahkoenig.ethos.grid.enums.Biome;
+import com.noahkoenig.ethos.gamemap.grid.Continents;
+import com.noahkoenig.ethos.gamemap.grid.Grid;
+import com.noahkoenig.ethos.gamemap.grid.Random;
+import com.noahkoenig.ethos.gamemap.grid.Tile;
 
 public class GameMap {
 	
@@ -30,7 +30,7 @@ public class GameMap {
 	
 	public GameMap () {
 		fileName = generateTimestamp() + "_" + counter++;
-		grid = new Grid(128, 72, 66, 0);
+		grid = new Continents(7, 128, 72, 70, 3);
 		generateTmxFileFromGrid(grid);
 	}
 	
@@ -45,6 +45,12 @@ public class GameMap {
 	public void dispose () {
 		tiledMap.dispose();
 	}
+
+	private static String generateTimestamp() {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        return dateFormat.format(date);
+    }
 
 	private static void generateTmxFileFromGrid (Grid grid) {
 		try {
@@ -85,10 +91,10 @@ public class GameMap {
 			xmlWriter.writeAttribute("encoding", "csv");
 			StringBuilder csvBuilder = new StringBuilder();
 			csvBuilder.append("\n");
-			for (int y = 0; y < grid.getHeight(); y++) {
+			for (int y = grid.getHeight() - 1; y >= 0; y--) { // csv has 0,0 in the bottom left while our grid has 0,0 at the top left, forcing us to reverse the y index here
 				List<Tile> tiles = grid.getTiles().get(y);
 				for (int x = 0; x < grid.getWidth(); x++) {
-					String appendix = (x == grid.getWidth() - 1 && y == grid.getHeight() - 1) ? "" : ",";
+					String appendix = (x == grid.getWidth() - 1 && y == 0) ? "" : ",";
                     csvBuilder.append(tiles.get(x).getBiome().ID + appendix);
                 }
 				csvBuilder.append("\n");
@@ -105,43 +111,12 @@ public class GameMap {
         }
 	}
 
-	private static String generateTimestamp() {
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
-        return dateFormat.format(date);
-    }
-
 	public void loadTmxFile() {
 		tiledMap = new TmxMapLoader().load("maps/" + fileName + ".tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 	}
 
-	public Biome getBiomeByCoordinate (int layer, int col, int row) {
-		Cell cell = ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getCell(col, row);
-		if (cell != null) {
-			TiledMapTile tile = cell.getTile();
-			if (tile != null) {
-				return Biome.getBiomeById((byte) tile.getId());
-			}
-		}
-		return null;
-	}
-
-	public Biome getBiomeByLocation (int layer, float x, float y) {
-		return getBiomeByCoordinate(layer, (int) (x / TILE_SIZE), (int) (y / TILE_SIZE));
-	}
-
-	public int getWidth () {
-		return ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getWidth();
-	}
-
-	public int getHeight () {
-		return ((TiledMapTileLayer) tiledMap.getLayers().get(0)).getHeight();
-	}
-
-	public int getLayers() {
-		return tiledMap.getLayers().getCount();
-	}
+    // Getters and Setters ============================================================================================================
 
 	public Grid getGrid() { return grid; }
 }

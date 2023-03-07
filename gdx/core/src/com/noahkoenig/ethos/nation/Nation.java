@@ -5,15 +5,15 @@ import java.util.List;
 
 public class Nation {
     
-    final NationType type;
-    Settlement capital;
-    List<Region> regions = new ArrayList<Region>();
+    public final NationType TYPE;
+    private Settlement capital;
+    private List<Region> regions = new ArrayList<Region>();
 
     Nation(NationType type) {
-        this.type = type;
+        this.TYPE = type;
     }
 
-    public NationType getType() { return type; }
+    public Settlement getCapital() { return capital; }
     
     public List<Region> getRegions() { return regions; }
 }

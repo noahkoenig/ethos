@@ -1,12 +1,12 @@
-package com.noahkoenig.ethos.grid;
+package com.noahkoenig.ethos.gamemap.grid;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.noahkoenig.ethos.grid.enums.Biome;
-import com.noahkoenig.ethos.grid.enums.Elevation;
-import com.noahkoenig.ethos.grid.enums.Terrain;
+import com.noahkoenig.ethos.gamemap.enums.Biome;
+import com.noahkoenig.ethos.gamemap.enums.Elevation;
+import com.noahkoenig.ethos.gamemap.enums.Terrain;
 
 public class Tile implements TiledMapTile {
 
@@ -15,8 +15,9 @@ public class Tile implements TiledMapTile {
     private Terrain terrain;
     public final int X;
     public final int Y;
+    public static final int SIZE = 16; // in pixels
 
-    Tile(Elevation elevation, Biome biome, Terrain terrain, int y, int x) {
+    public Tile(Elevation elevation, Biome biome, Terrain terrain, int y, int x) {
         this.elevation = elevation;
         this.biome = biome;
         this.terrain = terrain;

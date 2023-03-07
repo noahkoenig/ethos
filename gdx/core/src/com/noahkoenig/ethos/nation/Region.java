@@ -3,13 +3,13 @@ package com.noahkoenig.ethos.nation;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.noahkoenig.ethos.grid.Tile;
+import com.noahkoenig.ethos.gamemap.grid.Tile;
 
 public class Region {
 
-    String name;
-    List<Settlement> settlements = new ArrayList<Settlement>();
-    List<Tile> tiles = new ArrayList<Tile>();
+    private String name;
+    private List<Settlement> settlements = new ArrayList<Settlement>();
+    private List<Tile> tiles = new ArrayList<Tile>();
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }

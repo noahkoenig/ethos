@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.noahkoenig.ethos.grid.GameMap;
-import com.noahkoenig.ethos.grid.enums.Biome;
+import com.noahkoenig.ethos.gamemap.GameMap;
+import com.noahkoenig.ethos.gamemap.grid.Tile;
 
 public class Ethos extends ApplicationAdapter {
 	
@@ -44,7 +44,7 @@ public class Ethos extends ApplicationAdapter {
                 return false;
             }
         });
-        System.out.println("Welcome to Ethos! Press L to load the map into the viewport.");
+        System.out.println("Welcome to Ethos! A .tmx map has been generated. Press L to load the map into the viewport.");
 	}
 
 	@Override
@@ -75,9 +75,13 @@ public class Ethos extends ApplicationAdapter {
             camera.update();
         } else if (Gdx.input.justTouched()) {
             Vector3 pos = camera.unproject(new Vector3(Gdx.input.getX(), Gdx.input.getY(), 0));
-            Biome biome = gameMap.getBiomeByLocation(1, pos.x, pos.y);
-            if (biome != null) {
-                System.out.println("You clicked on tile with id " + biome.ID + " " + biome.toString());
+            Tile tile = gameMap.getGrid().getTileByPosition((int) (pos.x / Tile.SIZE), (int) (pos.y / Tile.SIZE));
+            if (tile != null) {
+                System.out.println("Clicked Tile: "
+                + "Position " + tile.X + " " + tile.Y
+                + ", Biome " + tile.getBiome()
+                + ", Elevation " + tile.getElevation().INDEX
+                + ", Terrain " + tile.getTerrain());
             }
         } else if (Gdx.input.isKeyPressed(Keys.L)) {
             gameMap.loadTmxFile();
