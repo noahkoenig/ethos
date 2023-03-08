@@ -1,12 +1,10 @@
 package com.noahkoenig.ethos.gamemap.grid;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.noahkoenig.ethos.gamemap.enums.Biome;
 import com.noahkoenig.ethos.gamemap.enums.GridType;
 
 /**
- * A script that generates a completely random map. Not suitable for gameplay in my opinion.
+ * A script that generates a completely random map. Not suitable for gameplay in most cases.
  */
 public class Random extends Grid {
 
@@ -17,14 +15,16 @@ public class Random extends Grid {
 
     @Override
     protected void generateGrid() {
-        for(int x = 0; x < HEIGHT; x++) {
-            List<Tile> row = new ArrayList<Tile>();
-            for(int y = 0; y < WIDTH; y++) {
+        for(int x = 0; x < WIDTH; x++) {
+            for(int y = 0; y < HEIGHT; y++) {
                 Biome biome = (int) (Math.random() * 100 + 1) > OCEAN_PERCENTAGE
                     ? getRandomLandBiomeByLatitude(getLatitudeOfRow(x)) : Biome.OCEAN;
-                row.add(new Tile(getRandomElevationByBiome(biome), biome, getRandomTerrain(), x, y));
+
+                Tile tile = getTiles().get(x).get(y);
+                tile.setBiome(biome);
+                tile.setElevation(getRandomElevationByBiome(biome));
+                tile.setTerrain(getRandomTerrain());
             }
-            getTiles().put(x, row);
         }
     }
 }

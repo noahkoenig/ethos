@@ -6,7 +6,6 @@ import java.util.Date;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.List;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -14,9 +13,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.noahkoenig.ethos.gamemap.grid.ContinentsAndIslands;
+import com.noahkoenig.ethos.gamemap.grid.Continents;
 import com.noahkoenig.ethos.gamemap.grid.Grid;
-import com.noahkoenig.ethos.gamemap.grid.Tile;
 
 public class GameMap {
 	
@@ -29,7 +27,7 @@ public class GameMap {
 	
 	public GameMap () {
 		fileName = generateTimestamp() + "_" + counter++;
-		grid = new ContinentsAndIslands(128, 72, (float) 0.66, (float) 0.5, 128, (float) 0.8);
+		grid = new Continents(128, 72, (float) 0.66, (float) 0.5, 128, (float) 0.8);
 		generateTmxFileFromGrid(grid);
 	}
 	
@@ -90,11 +88,10 @@ public class GameMap {
 			xmlWriter.writeAttribute("encoding", "csv");
 			StringBuilder csvBuilder = new StringBuilder();
 			csvBuilder.append("\n");
-			for (int y = grid.HEIGHT - 1; y >= 0; y--) { // csv has 0,0 in the bottom left while our grid has 0,0 at the top left, forcing us to reverse the y index here
-				List<Tile> tiles = grid.getTiles().get(y);
+			for (int y = grid.HEIGHT - 1; y >= 0; y--) { // csv has 0,0 in the bottom left while our grid has 0,0 at the top left, forcing us to reverse the x here
 				for (int x = 0; x < grid.WIDTH; x++) {
 					String appendix = (x == grid.WIDTH - 1 && y == 0) ? "" : ",";
-                    csvBuilder.append(tiles.get(x).getBiome().ID + appendix);
+                    csvBuilder.append(grid.getTileByPosition(x, y).getBiome().ID + appendix);
                 }
 				csvBuilder.append("\n");
             }
@@ -104,7 +101,6 @@ public class GameMap {
 			xmlWriter.writeEndDocument();
 			xmlWriter.close();
             os.close();
-
 		} catch (Exception e) {
             e.printStackTrace();
         }

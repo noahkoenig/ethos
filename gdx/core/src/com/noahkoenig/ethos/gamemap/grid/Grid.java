@@ -35,24 +35,25 @@ public abstract class Grid {
         this.HEIGHT = height;
         this.OCEAN_PERCENTAGE = oceanPercentage;
         this.LATITUDE_TOLERANCE = latitudeTolerance;
-        fillGridWith(Elevation.EUPHOTIC, Biome.OCEAN, Terrain.FLAT);
+        initGridWithTiles(Elevation.EUPHOTIC, Biome.OCEAN, Terrain.FLAT);
     }
 
     protected abstract void generateGrid();
 
-    private void fillGridWith(Elevation elevation, Biome biome, Terrain terrain) {
-        for(int x = 0; x < HEIGHT; x++) {
-            List<Tile> row = new ArrayList<Tile>();
-            for(int y = 0; y < WIDTH; y++) {
-                row.add(new Tile(elevation, biome, terrain, x, y));
+    private void initGridWithTiles(Elevation elevation, Biome biome, Terrain terrain) {
+        for(int x = 0; x < WIDTH; x++) {
+            List<Tile> column = new ArrayList<Tile>();
+            for(int y = 0; y < HEIGHT; y++) {
+                column.add(new Tile(elevation, biome, terrain, x, y));
             }
-            tiles.put(x, row);
+            tiles.put(x, column);
         }
     }
 
     public Elevation getRandomElevationByBiome(Biome biome) {
-        byte index = (byte) ((Math.random() * (biome.MAX_ELEVATION - biome.MIN_ELEVATION) + biome.MIN_ELEVATION));
-        return getElevationByIndex(index);
+        return getElevationByIndex(
+            (int) (Math.random() * (biome.MAX_ELEVATION - biome.MIN_ELEVATION) + biome.MIN_ELEVATION)
+        );
     }
     
     /**
@@ -78,13 +79,13 @@ public abstract class Grid {
 
     public List<Tile> getNeighboringTilesByPosition(int width, int height) {
         List<Tile> neighboringTiles = new ArrayList<Tile>();
-        for (int y = -1; y <= 1; y++) {
-            if (isRowOnGrid(height + y)) {
-                List<Tile> row = tiles.get(height + y);
-                for (int x = -1; x <= 1; x++) {
+        for (int x = -1; x <= 1; x++) {
+            if (isColumnOnGrid(width + x)) {
+                List<Tile> column = tiles.get(width + x);
+                for (int y = -1; y <= 1; y++) {
                     if (x != 0 || y != 0) {
-                        neighboringTiles.add(row.get(
-                            isColumnOnGrid(width + x) ? width + x : getModulo(width + x, WIDTH)
+                        neighboringTiles.add(column.get(
+                            isRowOnGrid(height + y) ? height + y : getModulo(height + y, HEIGHT)
                         ));
                     }
                 }
@@ -93,7 +94,7 @@ public abstract class Grid {
         return neighboringTiles;
     }
 
-    public static Elevation getElevationByIndex(int index) {
+    public Elevation getElevationByIndex(int index) {
         for (Elevation elevation : Elevation.values()) {
             if (elevation.INDEX == index) {
                 return elevation;
@@ -125,13 +126,13 @@ public abstract class Grid {
     }
 
     public Tile getTileByPosition(int x, int y) {
-        return tiles.get(y).get(x);
+        return tiles.get(x).get(y);
     }
 
     public int getLandTileAmount() {
         int landTileAmount = 0;
-        for(int y = 0; y < tiles.size(); y++) {
-            for(Tile tile : tiles.get(y)) {
+        for(int x = 0; x < tiles.size(); x++) {
+            for(Tile tile : tiles.get(x)) {
                 if (!tile.getBiome().IS_WATER) {
                     landTileAmount++;
                 }
@@ -142,8 +143,8 @@ public abstract class Grid {
 
     public int getWaterTileAmount() {
         int waterTileAmount = 0;
-        for(int y = 0; y < tiles.size(); y++) {
-            for(Tile tile : tiles.get(y)) {
+        for(int x = 0; x < tiles.size(); x++) {
+            for(Tile tile : tiles.get(x)) {
                 if (tile.getBiome().IS_WATER) {
                     waterTileAmount++;
                 }

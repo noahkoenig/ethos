@@ -17,7 +17,7 @@ public class Tile implements TiledMapTile {
     public final int Y;
     public static final int SIZE = 16; // in pixels
 
-    public Tile(Elevation elevation, Biome biome, Terrain terrain, int y, int x) {
+    public Tile(Elevation elevation, Biome biome, Terrain terrain, int x, int y) {
         this.elevation = elevation;
         this.biome = biome;
         this.terrain = terrain;
