@@ -25,6 +25,8 @@ public class Ethos extends ApplicationAdapter {
     
 	@Override
 	public void create () {
+        System.out.println("Welcome to Ethos! A .tmx file will be generated based on your settings in GameMap.java.");
+        System.out.println("A message below will indicate that the map was generated successfully. If it takes too much time, try adjusting your settings.");
 		batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new ScreenViewport(camera);
@@ -44,7 +46,7 @@ public class Ethos extends ApplicationAdapter {
                 return false;
             }
         });
-        System.out.println("Welcome to Ethos! A .tmx map has been generated. Press L to load the map into the viewport.");
+        System.out.println("Map " + gameMap.getFileName() + ".tmx has been generated. Press L to load the map into the viewport.");
 	}
 
 	@Override

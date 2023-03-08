@@ -1,57 +1,62 @@
 package com.noahkoenig.ethos.gamemap.grid;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import com.noahkoenig.ethos.gamemap.enums.GridType;
 
-
+/**
+ * A script that generates roughly equally sized continents and no islands.
+ */
 public class Continents extends Grid {
 
     private final int CONTINENT_AMOUNT;
-    private Map<Integer, Integer> continentOrigins = new HashMap<Integer, Integer>();
+    private final float DETAIL;
+    private List<Tile> continentOrigins = new ArrayList<Tile>();
 
     /**
-     * @param continentAmount : approximate, not exact
+     * @param contintentAmount : Approximate, not exact. The number of tiles on the map the script tries to generate a continent from.
+     * @param detail : Between [0, 1[. The closer to 1, the more detail the map has, but it takes longer to generate.
      */
-    public Continents(int continentAmount, int width, int height, int oceanPercentage, int latitudeTolerance) {
+    public Continents(int width, int height, float oceanPercentage, float latitudeTolerance, int continentAmount, float detail) {
         super(GridType.CONTINENTS, width, height, oceanPercentage, latitudeTolerance);
         this.CONTINENT_AMOUNT = continentAmount;
+        this.DETAIL = detail;
         generateGrid();
     }
 
     @Override
     protected void generateGrid() {
         generateContinentOrigins();
-        generateContinentClusters();
+        generateContinents();
     }
 
     private void generateContinentOrigins() {
         for (int i = 0; i < CONTINENT_AMOUNT; i++) {
-            continentOrigins.put(
-                (int) (Math.random() * width),
-                (int) (Math.random() * height)
-            );
+            continentOrigins.add(getTileByPosition((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT)));
         }
     }
 
-    private void generateContinentClusters() {
-        while (getWaterTileAmount() > width * height * ((float) oceanPercentage / 100)) {
-            Map<Integer, Integer> newEntries = new HashMap<Integer, Integer>();
-            Map<Integer, Integer> removedEntries = new HashMap<Integer, Integer>();
-            for (Map.Entry<Integer, Integer> entry : continentOrigins.entrySet()) {
-                for (Tile tile : getNeighboringTilesByPosition(entry.getKey(), entry.getValue())) {
-                    if (Math.random() > 0.5) {
-                        tile.setBiome(getRandomLandBiomeByLatitude(getLatitudeOfRow(tile.Y), latitudeTolerance));
-                        removedEntries.put(entry.getKey(), entry.getValue());
-                        newEntries.put(tile.X, tile.Y);
+    private void generateContinents() {
+        while (getWaterTileAmount() > WIDTH * HEIGHT * OCEAN_PERCENTAGE) {
+            List<Tile> newTiles = new ArrayList<Tile>();
+            List<Tile> removedTiles = new ArrayList<Tile>();
+            Collections.shuffle(continentOrigins);
+            for (Tile continentOrigin : continentOrigins) {
+                List<Tile> neighboringTiles = getNeighboringTilesByPosition(continentOrigin.X, continentOrigin.Y);
+                Collections.shuffle(neighboringTiles);
+                for (Tile neighbor : neighboringTiles) {
+                    if (Math.random() > DETAIL) {
+                        neighbor.setBiome(getRandomLandBiomeByLatitude(getLatitudeOfRow(neighbor.Y)));
+                        removedTiles.add(continentOrigin);
+                        newTiles.add(neighbor);
                     }
                 }
             }
-            for (Map.Entry<Integer, Integer> entry : removedEntries.entrySet()) {
-                continentOrigins.remove(entry.getKey(), entry.getValue());
+            for (Tile removedTile : removedTiles) {
+                continentOrigins.remove(removedTile);
             }
-            continentOrigins.putAll(newEntries);
+            continentOrigins.addAll(newTiles);
         }
     }
 }

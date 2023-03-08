@@ -14,9 +14,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.noahkoenig.ethos.gamemap.grid.Continents;
+import com.noahkoenig.ethos.gamemap.grid.ContinentsAndIslands;
 import com.noahkoenig.ethos.gamemap.grid.Grid;
-import com.noahkoenig.ethos.gamemap.grid.Random;
 import com.noahkoenig.ethos.gamemap.grid.Tile;
 
 public class GameMap {
@@ -30,7 +29,7 @@ public class GameMap {
 	
 	public GameMap () {
 		fileName = generateTimestamp() + "_" + counter++;
-		grid = new Continents(7, 128, 72, 70, 3);
+		grid = new ContinentsAndIslands(128, 72, (float) 0.66, (float) 0.5, 128, (float) 0.8);
 		generateTmxFileFromGrid(grid);
 	}
 	
@@ -66,8 +65,8 @@ public class GameMap {
 			xmlWriter.writeAttribute("tiledversion", "1.9.2");
 			xmlWriter.writeAttribute("orientation", "orthogonal");
 			xmlWriter.writeAttribute("renderorder", "right-down");
-			xmlWriter.writeAttribute("width", String.valueOf(grid.getWidth()));
-			xmlWriter.writeAttribute("height", String.valueOf(grid.getHeight()));
+			xmlWriter.writeAttribute("width", String.valueOf(grid.WIDTH));
+			xmlWriter.writeAttribute("height", String.valueOf(grid.HEIGHT));
 			xmlWriter.writeAttribute("tilewidth", String.valueOf(TILE_SIZE));
 			xmlWriter.writeAttribute("tileheight", String.valueOf(TILE_SIZE));
 			xmlWriter.writeAttribute("infinite", "0");
@@ -83,18 +82,18 @@ public class GameMap {
 			xmlWriter.writeStartElement("layer");
             xmlWriter.writeAttribute("id", "1");
 			xmlWriter.writeAttribute("name", "Tile Layer 1");
-            xmlWriter.writeAttribute("width", String.valueOf(grid.getWidth()));
-			xmlWriter.writeAttribute("height", String.valueOf(grid.getHeight()));
+            xmlWriter.writeAttribute("width", String.valueOf(grid.WIDTH));
+			xmlWriter.writeAttribute("height", String.valueOf(grid.HEIGHT));
 			xmlWriter.writeCharacters("\n");
 
 			xmlWriter.writeStartElement("data");
 			xmlWriter.writeAttribute("encoding", "csv");
 			StringBuilder csvBuilder = new StringBuilder();
 			csvBuilder.append("\n");
-			for (int y = grid.getHeight() - 1; y >= 0; y--) { // csv has 0,0 in the bottom left while our grid has 0,0 at the top left, forcing us to reverse the y index here
+			for (int y = grid.HEIGHT - 1; y >= 0; y--) { // csv has 0,0 in the bottom left while our grid has 0,0 at the top left, forcing us to reverse the y index here
 				List<Tile> tiles = grid.getTiles().get(y);
-				for (int x = 0; x < grid.getWidth(); x++) {
-					String appendix = (x == grid.getWidth() - 1 && y == 0) ? "" : ",";
+				for (int x = 0; x < grid.WIDTH; x++) {
+					String appendix = (x == grid.WIDTH - 1 && y == 0) ? "" : ",";
                     csvBuilder.append(tiles.get(x).getBiome().ID + appendix);
                 }
 				csvBuilder.append("\n");
@@ -117,6 +116,8 @@ public class GameMap {
 	}
 
     // Getters and Setters ============================================================================================================
+
+	public String getFileName() { return fileName; }
 
 	public Grid getGrid() { return grid; }
 }
