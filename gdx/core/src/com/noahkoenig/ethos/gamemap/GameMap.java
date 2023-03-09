@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.noahkoenig.ethos.gamemap.grid.Continents;
+import com.noahkoenig.ethos.gamemap.enums.GridType;
 import com.noahkoenig.ethos.gamemap.grid.Grid;
 
 public class GameMap {
@@ -27,7 +27,8 @@ public class GameMap {
 	
 	public GameMap () {
 		fileName = generateTimestamp() + "_" + counter++;
-		grid = new Continents(128, 72, (float) 0.66, (float) 0.5, 128, (float) 0.8);
+		//grid = new Grid(128, 72, (float) 0.66, (float) 0.5, 256, (float) 0.8);
+		grid = new Grid(GridType.RANDOM, 128, 72, (float) 0.66, (float) 0.5);
 		generateTmxFileFromGrid(grid);
 	}
 	
