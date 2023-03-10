@@ -28,7 +28,7 @@ public class GameMap {
 	public GameMap () {
 		fileName = generateTimestamp() + "_" + counter++;
 		//grid = new Grid(128, 72, (float) 0.66, (float) 0.5, 256, (float) 0.8);
-		grid = new Grid(GridType.RANDOM, 128, 72, (float) 0.66, (float) 0.5);
+		grid = new Grid(GridType.CONTINENTS_AND_ISLANDS, 128, 72, (float) 0.66, (float) 0.5);
 		generateTmxFileFromGrid(grid);
 	}
 	

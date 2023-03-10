@@ -21,9 +21,8 @@ public class Grid {
     public final int HEIGHT;
     public final float OCEAN_PERCENTAGE;
     public final float LATITUDE_TOLERANCE;
-    private final int GENERATION_TILES_AMOUNT;
-    private final float DETAIL;
-    private List<Tile> generationTiles = new ArrayList<Tile>();
+    public final int GENERATION_TILES_AMOUNT;
+    public final float DETAIL;
     private Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
     /**
@@ -45,28 +44,30 @@ public class Grid {
     }
 
     private int getRandomGenerationTilesAmountByGridType(GridType type) {
+        int widthHeightAverage = (int) ((WIDTH + HEIGHT) * 0.5);
         switch(type) {
-            case RANDOM: return getRandomIntInRange(5, WIDTH * 5);
-            case CONTINENTS: return getRandomIntInRange((int) (WIDTH * 0.25), (int) (WIDTH * 0.5));
-            case ISLANDS: return getRandomIntInRange(WIDTH, WIDTH * 2);
-            case CONTINENTS_AND_ISLANDS: return getRandomIntInRange((int) (WIDTH * 0.75), (int) (WIDTH * 1.25));
-            default: return WIDTH;
+            case RANDOM: return getRandomIntInRange(5, widthHeightAverage * 5);
+            case PANGAEA: return 1;
+            case CONTINENTS: return getRandomIntInRange((int) (widthHeightAverage * 0.5), (int) (widthHeightAverage * 1));
+            case ISLANDS: return getRandomIntInRange((int) (widthHeightAverage * 1.5), (int) (widthHeightAverage * 2.5));
+            case CONTINENTS_AND_ISLANDS: return getRandomIntInRange((int) (widthHeightAverage * 1), (int) (widthHeightAverage * 1.5));
+            default: return widthHeightAverage;
         }
     }
 
     private float getRandomDetailByGridType(GridType type) {
         switch(type) {
-            case RANDOM: return getRandomFloatInRange(0, 1);
+            case RANDOM: return getRandomFloatInRange(0, (float) 0.99);
+            case PANGAEA: return getRandomFloatInRange((float) 0.75, (float) 0.85);
             case CONTINENTS: return getRandomFloatInRange((float) 0.8, (float) 0.9);
             case ISLANDS: return getRandomFloatInRange((float) 0.9, (float) 0.99);
             case CONTINENTS_AND_ISLANDS: return getRandomFloatInRange((float) 0.8, (float) 0.9);
-            default: return (float) 0.5;
+            default: return (float) 0.8;
         }
     }
 
     /**
      * Use this constructor if you want to create a Grid with GridType.CUSTOM. Here you can set the generationTiles and detail yourself.
-     * @param type : See GridType.
      * @param width : Minimum value is 2. Should be about twice the height.
      * @param height : Minimum value is 2. Should be about half the width.
      * @param oceanPercentage : Between [0, 1[.
@@ -75,20 +76,19 @@ public class Grid {
      * I recommend values somewhere between 0.5 * width and 2 * width
      * @param detail : Between [0, 1[. The closer to 1, the more detail the map has, but it takes longer to generate.
      */
-    public Grid(int width, int height, float oceanPercentage, float latitudeTolerance, int generationTiles, float detail) {
+    public Grid(int width, int height, float oceanPercentage, float latitudeTolerance, int generationTilesAmount, float detail) {
         this.TYPE = GridType.CUSTOM;
         this.WIDTH = width;
         this.HEIGHT = height;
         this.OCEAN_PERCENTAGE = oceanPercentage;
         this.LATITUDE_TOLERANCE = latitudeTolerance;
-        this.GENERATION_TILES_AMOUNT = generationTiles;
+        this.GENERATION_TILES_AMOUNT = generationTilesAmount;
         this.DETAIL = detail;
         initGrid();
     }
 
     private void initGrid() {
         initGridWithTiles(Elevation.EUPHOTIC, Biome.OCEAN, Terrain.FLAT);
-        initGenerationTiles();
         initBiomes();
     }
 
@@ -102,24 +102,21 @@ public class Grid {
         }
     }
 
-    private void initGenerationTiles() {
-        for (int i = 0; i < GENERATION_TILES_AMOUNT; i++) {
-            generationTiles.add(getTileByPosition((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT)));
-        }
-    }
-
     private void initBiomes() {
+        List<Tile> generationTiles = getGenerationTiles();
+        List<Tile> newTiles = new ArrayList<Tile>();
+        List<Tile> removedTiles = new ArrayList<Tile>();
         while (getWaterTileAmount() > WIDTH * HEIGHT * OCEAN_PERCENTAGE) {
-            List<Tile> newTiles = new ArrayList<Tile>();
-            List<Tile> removedTiles = new ArrayList<Tile>();
+            newTiles.clear();
+            removedTiles.clear();
             Collections.shuffle(generationTiles);
-            for (Tile continentOrigin : generationTiles) {
-                List<Tile> neighboringTiles = getNeighboringTilesByPosition(continentOrigin.X, continentOrigin.Y);
+            for (Tile generationTile : generationTiles) {
+                List<Tile> neighboringTiles = getNeighboringTilesByPosition(generationTile.X, generationTile.Y);
                 Collections.shuffle(neighboringTiles);
                 for (Tile neighbor : neighboringTiles) {
                     if (Math.random() > DETAIL) {
                         neighbor.setBiome(getRandomLandBiomeByLatitude(getLatitudeOfRow(neighbor.Y)));
-                        removedTiles.add(continentOrigin);
+                        removedTiles.add(generationTile);
                         newTiles.add(neighbor);
                     }
                 }
@@ -129,6 +126,18 @@ public class Grid {
             }
             generationTiles.addAll(newTiles);
         }
+    }
+
+    private List<Tile> getGenerationTiles() {
+        List<Tile> generationTiles = new ArrayList<Tile>();
+        if (TYPE.equals(GridType.PANGAEA)) {
+            generationTiles.add(getTileByPosition((int) (WIDTH * 0.5), (int) (HEIGHT * 0.5)));
+        } else {
+            for (int i = 0; i < GENERATION_TILES_AMOUNT; i++) {
+                generationTiles.add(getTileByPosition((int) (Math.random() * WIDTH), (int) (Math.random() * HEIGHT)));
+            }
+        }
+        return generationTiles;
     }
 
     public Elevation getRandomElevationByBiome(Biome biome) {
