@@ -2,7 +2,7 @@ package com.noahkoenig.ethos.gamemap.enums;
 
 public enum GridType {
     /**
-     * A completely random map. Not suitable for gameplay in many cases.
+     * A completely random map. Not suitable for gameplay in most cases.
      */
     RANDOM,
     /**
@@ -11,7 +11,7 @@ public enum GridType {
     CUSTOM,
     /**
      * A map with one big continent in the middle of the map and a vast ocean.
-     * If the ocean percentage is too high, the continent might block the sea route above and / or below the continent.
+     * If the ocean percentage is too low, the continent might block the sea route above and / or below the continent.
      */
     PANGAEA,
     /**
@@ -23,7 +23,7 @@ public enum GridType {
      */
     ISLANDS,
     /**
-     * A mix of CONTINENTS and ISLANDS. The most suitable for gameplay in my opinion.
+     * A mix of CONTINENTS and ISLANDS.
      */
     CONTINENTS_AND_ISLANDS,
     /**

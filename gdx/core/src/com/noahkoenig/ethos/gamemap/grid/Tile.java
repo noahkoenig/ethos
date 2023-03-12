@@ -25,6 +25,12 @@ public class Tile implements TiledMapTile {
         this.Y = y;
     }
 
+    public boolean isElevationAllowedForBiome() { 
+        return biome.MIN_ELEVATION <= elevation.INDEX && elevation.INDEX <= biome.MAX_ELEVATION;
+    }
+
+    // Getters and Setters ============================================================================================================
+
     public Elevation getElevation() { return elevation; }
     public void setElevation(Elevation elevation) { this.elevation = elevation; }
 
