@@ -25,6 +25,7 @@ public class Grid {
     public final int MAX_ELEVATION_MARGIN;
     public final int GENERATION_TILES_AMOUNT;
     public final float DETAIL;
+    public final float MIN_OCEAN_STEPPE_DISTANCE = (float) 3.0;
     private Map<Integer, List<Tile>> tiles = new HashMap<Integer, List<Tile>>();
 
     // Constructors ============================================================================================================
@@ -35,7 +36,7 @@ public class Grid {
      * @param height : Minimum value is 2. Should be about half the width.
      * @param oceanPercentage : Between [0, 1[. A value around 0.66 generates the best results in my opinion.
      * @param latitudeTolerance : Between 0.0 and 90.0. How much the Biomes latitude value can differ from min- and maxLatitude.
-     * @param maxElevationMargin : The maximum Elevation difference between two neighboring tiles. 2 works best for me. 0 will crash the script.
+     * @param maxElevationMargin : The maximum Elevation difference between two neighboring tiles. 2 or 3 works best, 0 will crash the script.
      */
     public Grid(GridType type, int width, int height, float oceanPercentage, float latitudeTolerance, int maxElevationMargin) {
         this.TYPE = type;
@@ -55,7 +56,7 @@ public class Grid {
      * @param height : Minimum value is 2. Should be about half the width.
      * @param oceanPercentage : Between [0, 1[.
      * @param latitudeTolerance : Between 0.0 and 90.0. How much the Biomes latitude value can differ from min- and maxLatitude.
-     * @param maxElevationMargin : The maximum Elevation difference between two neighboring tiles. 2 works best for me. 0 will crash the script.
+     * @param maxElevationMargin : The maximum Elevation difference between two neighboring tiles. 2 or 3 works best, 0 will crash the script.
      * @param generationTiles : Approximate, not exact. The number of tiles on the map the script tries to generate a continent from.
      * I recommend values somewhere between 0.5 * width and 2 * width
      * @param detail : Between [0, 1[. The closer to 1, the more detail the map has, but it takes longer to generate.
@@ -75,11 +76,6 @@ public class Grid {
     // Grid Init Functions ============================================================================================================
 
     private void initGrid() {
-        /**
-         * TODO:
-         * we should generate the elevation first and assign biomes after that based on the latitude and the elevation.
-         * that way we can have polar biomes even on the equator when the height is Glacial
-         */
         initGridWithTiles(getRandomElevationByBiome(Biome.OCEAN), Biome.OCEAN, Terrain.FLAT);
         initBiomes();
         initElevations();
@@ -87,7 +83,7 @@ public class Grid {
     }
 
     /**
-     * Adds a new Tile with the given attributes at every position on the map.
+     * Adds a new Tile with the given attributes at every position on the grid.
      * @param elevation : See Elevation
      * @param biome : See Biome
      * @param terrain : See Terrain
@@ -126,6 +122,8 @@ public class Grid {
             }
             generationTiles.addAll(newTiles);
         }
+        adjustLakesAndOceans();
+        adjustTemperateBiomes();
     }
 
     private List<Tile> getGenerationTiles() {
@@ -141,6 +139,40 @@ public class Grid {
     }
 
     /**
+     * Turns all landlocked OCEAN Biomes into LAKE Biomes.
+     */
+    private void adjustLakesAndOceans() {
+        //TODO
+    }
+
+    /**
+     * Adjusts the the temperate zone (FOREST, STEPPE and MEDITERRANEAN) parts of the map.
+     * MEDITERRANEAN Biomes are only found in coastal areas, while STEPPE is found in continental areas. FOREST is found in both areas.
+     */
+    private void adjustTemperateBiomes() {
+        for(int x = 0; x < WIDTH; x++) {
+            for(int y = 0; y < HEIGHT; y++) {
+                Tile tile = getTileByPosition(x, y);
+                if (tile.getBiome().equals(Biome.MEDITERRANEAN)) {
+                    if (getDistanceToNearestTileWithBiome(tile, Biome.OCEAN) > MIN_OCEAN_STEPPE_DISTANCE) {
+                        tile.setBiome(Biome.STEPPE);
+                    }
+                } else if (tile.getBiome().equals(Biome.STEPPE)) {
+                    if (getDistanceToNearestTileWithBiome(tile, Biome.OCEAN) < MIN_OCEAN_STEPPE_DISTANCE) {
+                        tile.setBiome(Biome.MEDITERRANEAN);
+                    }
+                } else if (tile.getBiome().equals(Biome.FOREST)) {
+                    if (getDistanceToNearestTileWithBiome(tile, Biome.OCEAN) > MIN_OCEAN_STEPPE_DISTANCE * 2) {
+                        if (Math.random() > 0.5) {
+                            tile.setBiome(Biome.STEPPE);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Initializes and aligns all Elevations based on MAX_ELEVATION_MARGIN.
      */
     private void initElevations() {
@@ -152,20 +184,44 @@ public class Grid {
                     for (Tile neighbor : getNeighboringTilesByPosition(tile.X, tile.Y)) {
                         int neighborMinElevation = neighbor.getElevation().INDEX - MAX_ELEVATION_MARGIN;
                         int neighborMaxElevation = neighbor.getElevation().INDEX + MAX_ELEVATION_MARGIN;
-                        if (!isNumberInRange(tile.getElevation().INDEX, neighborMinElevation, neighborMaxElevation)) {
+                        if (!isIntInRange(tile.getElevation().INDEX, neighborMinElevation, neighborMaxElevation)) {
                             tile.setElevation(getRandomElevationByBiome(tile.getBiome()));
                         }
                     }
                 }
             }
         }
+        adjustBiomesToElevations();
     }
 
+    /**
+     * Assigns random Elevations to all Land Tiles, no matter the Biome.
+     * Ocean Tiles get are assigned an Elevation in their min- and maxElevation range.
+     */
     private void assignRandomElevations() {
         for(int x = 0; x < WIDTH; x++) {
             for(int y = 0; y < HEIGHT; y++) {
                 Tile tile = getTileByPosition(x, y);
-                tile.setElevation(getRandomElevationByBiome(tile.getBiome()));
+                tile.setElevation(
+                    tile.getBiome().equals(Biome.OCEAN) ? getRandomElevationByBiome(tile.getBiome()) : getRandomElevationInRange(0, 6)
+                );
+            }
+        }
+    }
+
+    /**
+     * Checks if all Tiles have a Biome and Elevation combo that is allowed, and adjusts the Biome if not.
+     */
+    private void adjustBiomesToElevations() {
+        for(int x = 0; x < WIDTH; x++) {
+            for(int y = 0; y < HEIGHT; y++) {
+                Tile tile = getTileByPosition(x, y);
+                if (!tile.isElevationAllowedForBiome()) {
+                    for (Biome biome : Biome.getReplacementsByBiome(tile.getBiome())) {
+                        tile.setBiome(biome);
+                        if (tile.isElevationAllowedForBiome()) { break; }
+                    }
+                }
             }
         }
     }
@@ -209,24 +265,27 @@ public class Grid {
         }
     }
 
+    private Elevation getRandomElevationInRange(int minimum, int maximum) {
+        return getElevationByIndex(getRandomIntInRange(minimum, maximum));
+    }
+
     private Elevation getRandomElevationByBiome(Biome biome) {
-        int randomInt = getRandomIntInRange(biome.MIN_ELEVATION, biome.MAX_ELEVATION);
-        return getElevationByIndex(randomInt);
+        return getElevationByIndex(getRandomIntInRange(biome.MIN_ELEVATION, biome.MAX_ELEVATION));
     }
     
-    /**
-     * @param latitude : needs to be between 0.0 and 90.0
-     */
-    private Biome getRandomLandBiomeByLatitude(float latitude) {
-        List<Biome> biomes = new ArrayList<Biome>();
-        for (Biome biome : Biome.values()) {
-            if (biome.IS_WATER) {
-                continue;
-            } else if (biome.MIN_LATITUDE - LATITUDE_TOLERANCE <= latitude && latitude <= biome.MAX_LATITUDE + LATITUDE_TOLERANCE) {
-                biomes.add(biome);
+    private Biome getRandomLandBiomeByLatitude(float latitude) throws IllegalArgumentException {
+        if (isFloatInRange(latitude, (float) 0.0, (float) 90.0)) {
+            List<Biome> biomes = new ArrayList<Biome>();
+            for (Biome biome : Biome.values()) {
+                if (!biome.IS_WATER) {
+                    if (biome.MIN_LATITUDE - LATITUDE_TOLERANCE <= latitude && latitude <= biome.MAX_LATITUDE + LATITUDE_TOLERANCE) {
+                        biomes.add(biome);
+                    }
+                }
             }
+            return biomes.get(getRandomIntInRange(0, biomes.size() - 1));
         }
-        return biomes.get((int) (Math.random() * biomes.size()));
+        throw new IllegalArgumentException("Expected latitude between 0.0 and 90.0, got " + latitude);
     }
 
     private Terrain getRandomTerrain() {
@@ -234,6 +293,29 @@ public class Grid {
     }
 
     // Helper Functions ============================================================================================================
+
+    private float getDistanceToNearestTileWithBiome(Tile tile, Biome biome) {
+        float distance = (float) Integer.MAX_VALUE;
+        for(int x = 0; x < WIDTH; x++) {
+            for(int y = 0; y < HEIGHT; y++) {
+                Tile newTile = getTileByPosition(x, y);
+                if (newTile.getBiome().equals(biome)) {
+                    float newDistance = getDistanceBetweenTiles(tile, newTile);
+                    distance = newDistance < distance ? newDistance : distance;
+                }
+            }
+        }
+        return distance;
+    }
+
+    private float getDistanceBetweenTiles(Tile tileA, Tile tileB) {
+        float xDifference = tileB.X - tileA.X;
+        float yDifference = tileB.Y - tileA.Y;
+        float euclideanDistance = (float) Math.sqrt(xDifference * xDifference + yDifference * yDifference);
+        int minHorizontalDistance = Math.abs(Math.min(tileA.X, tileB.X) - Math.max(tileA.X, tileB.X) + WIDTH) % WIDTH;
+        float distance = (float) Math.sqrt(euclideanDistance * euclideanDistance + minHorizontalDistance * minHorizontalDistance);
+        return distance;
+    }
 
     public List<Tile> getNeighboringTilesByPosition(int xPos, int yPos) {
         List<Tile> neighboringTiles = new ArrayList<Tile>();
@@ -319,8 +401,12 @@ public class Grid {
         return waterTileAmount;
     }
 
-    private boolean isNumberInRange(int number, int mininum, int maximum) {
+    private boolean isIntInRange(int number, int mininum, int maximum) {
         return mininum <= number && number <= maximum;
+    }
+
+    private boolean isFloatInRange(float number, float minimum, float maximum) {
+        return minimum <= number && number <= maximum;
     }
 
     private boolean isMaxElevationMarginFulfilled() {
@@ -330,7 +416,7 @@ public class Grid {
                 int tileIndex = tile.getElevation().INDEX;
                 for (Tile neighbor : getNeighboringTilesByPosition(tile.X, tile.Y)) {
                     int neighborIndex = neighbor.getElevation().INDEX;
-                    if (!isNumberInRange(tileIndex, neighborIndex - MAX_ELEVATION_MARGIN, neighborIndex + MAX_ELEVATION_MARGIN)) {
+                    if (!isIntInRange(tileIndex, neighborIndex - MAX_ELEVATION_MARGIN, neighborIndex + MAX_ELEVATION_MARGIN)) {
                         return false;
                     }
                 }
